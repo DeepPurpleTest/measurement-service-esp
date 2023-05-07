@@ -16,7 +16,6 @@ public:
     float measurements() override {
         Serial.println("SensorWithTemperature.measurements() start");
 
-        //this->dht.begin();
         sensors_event_t event;
         this->dht.temperature().getEvent(&event);
 

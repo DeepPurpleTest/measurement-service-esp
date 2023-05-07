@@ -20,4 +20,4 @@ class UserEntity {
   }
 };
 
-#endif // USER_ENTITY_H
+#endif

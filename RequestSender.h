@@ -8,7 +8,7 @@ class RequestSender {
     HTTPClient &http;
     
   public:
-    RequestSender(RequestBuilder &requestBuilder, HTTPClient &http) : jsonMaker(jsonMaker), http(http){}
+    RequestSender(RequestBuilder &requestBuilder, HTTPClient &http) : requestBuilder(requestBuilder), http(http){}
 
     void sendAuthoRequest(UserEntity user, String endpoint, String &token) {
         Serial.println("sendAuthoRequest() start");

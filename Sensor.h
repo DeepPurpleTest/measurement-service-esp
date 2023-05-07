@@ -20,4 +20,4 @@ public:
     virtual float measurements() = 0;
 };
 
-#endif // SENSOR_H
+#endif

@@ -11,7 +11,6 @@ class RequestBuilder {
     const String TYPE_JSON = "application/json";
     const String AUTHORIZATION = "Authorization";
     HTTPClient &http;
-    //StaticJsonDocument<200> doc;
     String url;
 
   public:
