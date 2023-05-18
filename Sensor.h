@@ -17,7 +17,8 @@ public:
     }
 
 public:
-    virtual float measurements() = 0;
+    virtual float getMeasure() = 0;
+    virtual void setMeasure(float measure) = 0;
 };
 
 #endif

@@ -44,12 +44,12 @@ class RequestSender {
     }
 
     void sendSensorData(Sensor& sensor, String endpoint, String token) {
-        Serial.println("sendSensorData() стартанул");
+        Serial.println("sendSensorData() start");
 
         String requestBody;
         StaticJsonDocument<200> doc = requestBuilder.createJson(endpoint, token);
         doc["sensorId"] = sensor.getId();
-        doc["value"] = sensor.measurements();
+        doc["value"] = sensor.getMeasure();
 
         serializeJson(doc, requestBody);
         int httpResponseCode = http.POST(requestBody);
@@ -61,6 +61,6 @@ class RequestSender {
             Serial.println(response);
         }
 
-        Serial.println("sendSensorData() закончил");
+        Serial.println("sendSensorData() end");
     }
 };

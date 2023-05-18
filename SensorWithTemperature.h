@@ -5,32 +5,18 @@
 
 class SensorWithTemperature : public Sensor {
 public:
-    DHT_Unified dht;
+    float measure;
 
 public:
-    SensorWithTemperature(int id, int pin, int type) : Sensor(id), dht(pin, type) {
-        this->dht.begin();
+    SensorWithTemperature(int id) : Sensor(id) {
     }
 
 public:
-    float measurements() override {
-        Serial.println("SensorWithTemperature.measurements() start");
+    float getMeasure() override {
+      return this->measure;
+    }
 
-        sensors_event_t event;
-        this->dht.temperature().getEvent(&event);
-
-        if (isnan(event.temperature)) {
-            Serial.println(F("Error reading temperature!"));
-            delay(5000);
-            return this->measurements();
-        }
-        else {
-            Serial.print(F("Temperature: "));
-            Serial.print(event.temperature);
-            Serial.println(F("�C"));
-
-            Serial.println("SensorWithTemperature.measurements() end");
-            return event.temperature;
-        }
+    void setMeasure(float measure) {
+      this->measure = measure;
     }
 };

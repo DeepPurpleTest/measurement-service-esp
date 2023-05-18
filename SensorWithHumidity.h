@@ -5,32 +5,18 @@
 
 class SensorWithHumidity : public Sensor {
 public:
-    DHT_Unified dht;
+    float measure;
 
 public:
-    SensorWithHumidity(int id, int pin, int type) : Sensor(id), dht(pin, type) {
-        this->dht.begin();
+    SensorWithHumidity(int id) : Sensor(id) {
     }
 
 public:
-    float measurements() override {
-        Serial.println("SensorWithHumidity.measurements() start");
+    float getMeasure() override {
+      return this->measure;
+    }
 
-        sensors_event_t event;
-        this->dht.humidity().getEvent(&event);
-
-        if (isnan(event.relative_humidity)) {
-            Serial.println(F("Error reading humidity!"));
-            delay(5000);
-            return this->measurements();
-        }
-        else {
-            Serial.print(F("Humidity: "));
-            Serial.print(event.relative_humidity);
-            Serial.println(F("%"));
-
-            Serial.println("SensorWithHumidity.measurements() end");
-            return event.relative_humidity;
-        }
+    void setMeasure(float measure) {
+      this->measure = measure;
     }
 };

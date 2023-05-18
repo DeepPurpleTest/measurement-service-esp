@@ -1,11 +1,11 @@
 #include "Sensor.h"
 
-class SensorWithSound : public Sensor {
+class SensorWithWaterLevel : public Sensor {
   public:
   float measure;
 
   public:
-  SensorWithSound(int id) : Sensor(id) {}
+  SensorWithWaterLevel(int id) : Sensor(id) {}
 
 public:
   float getMeasure() override {
