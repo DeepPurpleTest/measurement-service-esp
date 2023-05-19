@@ -9,7 +9,7 @@ class SensorWithSound : public Sensor {
 
 public:
   float getMeasure() override {
-    return measure;
+    return map(measure, 0, 1023, 30, 90);
   }
 
 public: 

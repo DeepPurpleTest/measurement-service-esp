@@ -13,6 +13,8 @@
 #include "SensorWithHumidity.h"
 #include "SensorWithSound.h"
 #include "SensorWithWaterLevel.h"
+#include "SensorWithVibration.h"
+
 
 #include <regex>
 
@@ -41,10 +43,12 @@ WiFiConnection connection(SSID, PASSWORD);
 UserEntity user("admin", "admin");
 RequestBuilder requestBuilder(http, URL);
 RequestSender requestSender(requestBuilder, http);
-SensorWithTemperature sensorWithTemperature(1); //Sensor with temperature
-SensorWithHumidity sensorWithHumidity(2); //Sensor with humidity
-SensorWithSound sensorWithSound(3); //Sensor with sound
-SensorWithWaterLevel sensorWithWaterLevel(4); //Sensor with water level 
+
+SensorWithSound sensorWithSound(1); //Sensor with sound
+SensorWithWaterLevel sensorWithWaterLevel(2); //Sensor with water level 
+SensorWithTemperature sensorWithTemperature(3); //Sensor with temperature
+SensorWithHumidity sensorWithHumidity(4); //Sensor with humidity
+SensorWithVibration sensorWithVibration(5); //Sensor with water level 
 
 
 const int RXp2 = 3; // RX pin for ESP32-CAM
@@ -82,13 +86,16 @@ void loop() {
       sensorWithWaterLevel.setMeasure(values[1]);
       sensorWithTemperature.setMeasure(values[2]);
       sensorWithHumidity.setMeasure(values[3]);
+      sensorWithVibration.setMeasure(values[4]);
+
 
       requestSender.sendSensorData(sensorWithSound, CREATE_MEASURE, token);
       requestSender.sendSensorData(sensorWithWaterLevel, CREATE_MEASURE, token);
       requestSender.sendSensorData(sensorWithTemperature, CREATE_MEASURE, token);
       requestSender.sendSensorData(sensorWithHumidity, CREATE_MEASURE, token);
+      requestSender.sendSensorData(sensorWithVibration, CREATE_MEASURE, token);
     }
-    delay(500);
+    delay(300);
   }
   else {
     requestSender.sendAuthoRequest(user, AUTH, token);
