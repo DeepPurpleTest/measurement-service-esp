@@ -1,6 +1,8 @@
 #include <HTTPClient.h>
 #include "UserEntity.h"
 #include "Sensor.h"
+#include "ForbiddenException.h"
+
 
 class RequestSender {
   private: 
@@ -23,7 +25,7 @@ class RequestSender {
 
         Serial.println(httpResponseCode);
 
-        if (httpResponseCode > 0) {            //if code > 0 (any, 200, 400, 404 etc.)
+        if (httpResponseCode == 200) {            //if code > 0 (any, 200, 400, 404 etc.)
             String response = http.getString();  //so we have some answer and we can print our response
             Serial.println(response);
 
@@ -38,12 +40,17 @@ class RequestSender {
                 token = String(jsonToken);
                 Serial.println(token); //Print token value
             }
+        } else {
+          String response = http.getString();
+          Serial.println(response);
+          sendAuthoRequest(user, endpoint, token);
+          delay(5000);
         }
 
         Serial.println("sendAuthoRequest() end");
     }
 
-    void sendSensorData(Sensor& sensor, String endpoint, String token) {
+    void sendSensorData(Sensor& sensor, String endpoint, String &token) {
         Serial.println("sendSensorData() start");
 
         String requestBody;
@@ -56,6 +63,10 @@ class RequestSender {
 
         Serial.println(requestBody);
         Serial.println(httpResponseCode);
+        if(httpResponseCode == 403) {
+          throw ForbiddenException();
+        }
+
         if (httpResponseCode > 0) {            //if code > 0 (any, 200, 400, 404 etc.)
             String response = http.getString();  //so we have some answer and we can print our response
             Serial.println(response);
