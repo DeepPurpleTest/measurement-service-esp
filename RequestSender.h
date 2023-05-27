@@ -23,6 +23,8 @@ class RequestSender {
         serializeJson(doc, requestBody);                // serialization of json
         int httpResponseCode = http.POST(requestBody);
 
+        Serial.println(user.getLogin());
+        Serial.println(user.getPassword());
         Serial.println(httpResponseCode);
 
         if (httpResponseCode == 200) {            //if code > 0 (any, 200, 400, 404 etc.)
@@ -42,7 +44,7 @@ class RequestSender {
             }
         } else {
           String response = http.getString();
-          Serial.println(response);
+          Serial.println("STATUS " + response);
           sendAuthoRequest(user, endpoint, token);
           delay(5000);
         }

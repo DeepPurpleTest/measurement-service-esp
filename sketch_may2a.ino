@@ -3,7 +3,6 @@
 #include <HTTPClient.h>
 #include "WiFiConnection.h"
 #include "Time.h"
-//#include <HardwareSerial.h>
 
 #include "SDStorageService.h"
 #include "UserEntity.h"
@@ -33,7 +32,7 @@ const long  gmtOffset_sec = 2 * 60 * 60;
 const int   daylightOffset_sec = 3600;
 
 // Creat URL for requests
-const String IP = "192.168.0.102";
+const String IP = "192.168.0.103";
 const String SERVER_PORT = "8080";
 const String URL = "https://" + IP + ":" + SERVER_PORT;
 
@@ -64,6 +63,11 @@ Sensor* sensors[] = {&sensorWithSound, &sensorWithWaterLevel, &sensorWithTempera
 const int RXp2 = 3; // RX pin for ESP32-CAM
 const int TXp2 = 1; // TX pin for ESP32-CAM
 
+
+vector<int> getValuesFromString(String data);
+void fillSensorsMeasure(vector<int> values);
+
+
 void setup() {
   Serial.begin(9600, SERIAL_8N1, RXp2, TXp2);
   connection.getWiFiConnection();
@@ -75,47 +79,50 @@ void setup() {
 
 void loop() {
     if (Serial.available()) {
-      String dataString = Serial.readStringUntil('\n');  // Чтение строки данных до символа новой строки
-
-      regex pattern("(A\\d+) = (\\d+)");
-      smatch matches;
-      string inputStr = dataString.c_str();
-      vector<int> values;
-
-      while (regex_search(inputStr, matches, pattern)) {
-        if (matches.size() > 2) {
-          string valueStr = matches[2].str();
-          int value = atoi(valueStr.c_str());
-
-          values.push_back(value);
-        }
-  
-        inputStr = matches.suffix().str();
-      }
-    
-      sensorWithSound.setMeasure(values[0]);
-      sensorWithWaterLevel.setMeasure(values[1]);
-      sensorWithTemperature.setMeasure(values[2]);
-      sensorWithHumidity.setMeasure(values[3]);
-      sensorWithVibration.setMeasure(values[4]);
-
-      try {
-        requestSender.sendSensorData(sensorWithSound, CREATE_MEASURE, token);
-        requestSender.sendSensorData(sensorWithWaterLevel, CREATE_MEASURE, token);
-        requestSender.sendSensorData(sensorWithTemperature, CREATE_MEASURE, token);
-        requestSender.sendSensorData(sensorWithHumidity, CREATE_MEASURE, token);
-        requestSender.sendSensorData(sensorWithVibration, CREATE_MEASURE, token);
-      } catch(const ForbiddenException& e) {
-        Serial.println("Caught ForbiddenException: " + String(e.what()));
-        requestSender.sendAuthoRequest(user, AUTH, token);
-      }
+      String dataString = Serial.readStringUntil('\n');  // Reading a data string up to a newline character
+      
+      vector<int> values = getValuesFromString(dataString);
+      fillSensorsMeasure(values);
 
       if(sdStorageService.getInit()) {
         // sizeof return mas of bytes / size of one object
         sdStorageService.writeData(sensors, (sizeof(sensors) / sizeof(sensors[0])));
       }
+
+      try {
+        for(int i = 0; i < sizeof(sensors) / sizeof(sensors[0]); i++) {
+          requestSender.sendSensorData(*sensors[i], CREATE_MEASURE, token);
+        }
+      } catch(const ForbiddenException& e) {
+        Serial.println("Caught ForbiddenException: " + String(e.what()));
+        requestSender.sendAuthoRequest(user, AUTH, token);
+      }  
     }
     delay(300);
 }
+
+vector<int> getValuesFromString(String data) {
+  regex pattern("(A\\d+) = (\\d+)");
+  smatch matches;
+  string inputStr = data.c_str();
+  vector<int> values;
+
+  while (regex_search(inputStr, matches, pattern)) {
+    if (matches.size() > 2) {
+      string valueStr = matches[2].str();
+      int value = atoi(valueStr.c_str());
+      values.push_back(value);
+    }
+    inputStr = matches.suffix().str();
+  }
+  return values;
+}
+
+void fillSensorsMeasure(vector<int> values) {
+  for(int i = 0; i < values.size(); i++) {
+    sensors[i]->setMeasure(values[i]);
+  }
+} 
+
 
 
